@@ -4,15 +4,27 @@ DistributedSampler is in charge of divide the data among the different
 processes.
 
 Then init_process_group initializes the communication between processes,
-it starts a process group, which is a group of processes that can talk
-to each other to share gradients and synchronize model parameters.
+it starts a process group for all the processes, which is a group of
+processes that can talk to each other to share gradients and
+synchronize model parameters.
 
-destroy_process_group releases the resources.
+destroy_process_group just releases the resources.
 
 The following code is the same as in the notebook, but it adds DDP.
 
-To run:
+To run in 2 GPUs (it also works with 1):
 torchrun --nproc_per_node=2 pytorch_one_hour_DDP.py
+this command will launch one process per GPU and assigns each process
+a unique rank
+
+Workflow:
+
+1. ddl_setup launches the processes
+2. It setups the model, load the datasets
+3. wraps the model with DDP to synchronize gradients
+4. starts training loop transferring the model and data to the GPU
+5. release the resources
+
 """
 import torch
 import torch.nn.functional as F
